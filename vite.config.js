@@ -5,17 +5,20 @@ import IconsResolver from 'unplugin-icons/resolver'
 import Components from 'unplugin-vue-components/vite'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    vue(),
-    Icons({ compiler: 'vue3' }),
-    Components({
-      resolvers: [IconsResolver()]
-    })
-  ],
-  resolve: {
-    alias: {
-      '@': '/src'
+export default defineConfig(({ mode }) => {
+  return {
+    base: mode === 'production' ? '/info-kajian-generator/' : '/',
+    plugins: [
+      vue(),
+      Icons({ compiler: 'vue3' }),
+      Components({
+        resolvers: [IconsResolver()]
+      })
+    ],
+    resolve: {
+      alias: {
+        '@': '/src'
+      }
     }
   }
 })
