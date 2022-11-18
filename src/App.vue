@@ -42,21 +42,35 @@ const removeEvent = (id) => {
 
 const editorRef = ref(null)
 
-const setHideOnSave = (invisible) => {
+/**
+ * We use preSave and postSave to manipulate
+ * the dom before generating the image.
+ *
+ * This is because the limitations of html-to-image
+ * that can't handle it properly
+ */
+const preSave = () => {
+  // We don't need border radius
+  editorRef.value.style.borderRadius = '0px'
+
+  // Hide all element with hide-on-save class
   const elements = document.querySelectorAll('.hide-on-save')
-  if (invisible) {
-    elements.forEach((el) => {
-      el.style.display = 'none'
-    })
-  } else {
-    elements.forEach((el) => {
-      el.style.removeProperty('display')
-    })
-  }
+  elements.forEach((el) => {
+    el.style.display = 'none'
+  })
+}
+
+const postSave = () => {
+  // Rollback from preSave
+  editorRef.value.style.removeProperty('border-radius')
+  const elements = document.querySelectorAll('.hide-on-save')
+  elements.forEach((el) => {
+    el.style.removeProperty('display')
+  })
 }
 
 const download = () => {
-  setHideOnSave(true)
+  preSave()
 
   const el = editorRef.value
   const filename = 'info-kajian-' + dayjs().valueOf()
@@ -66,11 +80,10 @@ const download = () => {
     canvasWidth: el.offsetWidth * SCALE,
     canvasHeight: el.offsetHeight * SCALE,
     style: {
-      margin: 0,
-      borderRadius: 0
+      margin: 0
     }
   }).then((blob) => {
-    setHideOnSave(false)
+    postSave()
     saveAs(blob, filename + '.png')
   })
 }
