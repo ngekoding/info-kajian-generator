@@ -88,7 +88,7 @@ const save = () => {
   if (!validate()) return
 
   const event = {
-    ...(!isEdit.value && { id: nanoid() }),
+    id: isEdit.value ? props.oldEvent.id : nanoid(),
     ...form
   }
 
