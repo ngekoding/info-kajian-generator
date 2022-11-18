@@ -13,7 +13,6 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.4",
     "dayjs": "^1.11.6",
-    "dom-to-image-more": "^2.12.0",
     "file-saver": "^2.0.5",
     "html-to-image": "^1.10.8",
     "nanoid": "^4.0.0",
