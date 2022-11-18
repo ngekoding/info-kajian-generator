@@ -10,9 +10,12 @@ export default defineConfig({
     vue(),
     Icons({ compiler: 'vue3' }),
     Components({
-      resolvers: [
-        IconsResolver()
-      ]
+      resolvers: [IconsResolver()]
     })
-  ]
+  ],
+  resolve: {
+    alias: {
+      '@': '/src'
+    }
+  }
 })
