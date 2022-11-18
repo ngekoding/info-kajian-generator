@@ -42,12 +42,22 @@ const removeEvent = (id) => {
 
 const editorRef = ref(null)
 
-const downloadFilter = (node) => {
-  const ignoredClasses = ['hide-on-save']
-  return !ignoredClasses.some((cls) => node?.classList?.contains(cls))
+const setHideOnSave = (invisible) => {
+  const elements = document.querySelectorAll('.hide-on-save')
+  if (invisible) {
+    elements.forEach((el) => {
+      el.style.display = 'none'
+    })
+  } else {
+    elements.forEach((el) => {
+      el.style.removeProperty('display')
+    })
+  }
 }
 
 const download = () => {
+  setHideOnSave(true)
+
   const el = editorRef.value
   const filename = 'info-kajian-' + dayjs().valueOf()
   const SCALE = 2.5
@@ -58,9 +68,9 @@ const download = () => {
     style: {
       margin: 0,
       borderRadius: 0
-    },
-    filter: downloadFilter
+    }
   }).then((blob) => {
+    setHideOnSave(false)
     saveAs(blob, filename + '.png')
   })
 }
