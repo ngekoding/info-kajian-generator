@@ -1,16 +1,37 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useStorage } from '@vueuse/core'
 import { groupBy } from './helpers/array'
-import EventFormDialog from './components/EventFormDialog.vue'
 import dayjs from '@/plugins/dayjs'
 import { toBlob } from 'html-to-image'
 import { saveAs } from 'file-saver'
+import { isEqual } from 'lodash'
+
+import EventFormDialog from './components/EventFormDialog.vue'
+import ContentEditable from 'vue-contenteditable'
 
 const showEventFormDialog = ref(false)
 
-const events = ref([])
+const headerInfoDefault = {
+  intro: 'Hadir dan Ikutilah',
+  title: 'Kajian Islam Ilmiah',
+  description: 'Keterangan Lainnya'
+}
+
+const headerInfo = useStorage('header-info', headerInfoDefault)
+
+const events = useStorage('events', [])
 const groupedEvents = computed(() => groupBy(events.value, 'date'))
 const oldEvent = ref(null)
+
+const isAnyChanges = computed(
+  () => events.value.length > 0 || !isEqual(headerInfo.value, headerInfoDefault)
+)
+
+const reset = () => {
+  events.value = []
+  headerInfo.value = headerInfoDefault
+}
 
 const createEvent = () => {
   oldEvent.value = null
@@ -117,29 +138,26 @@ const download = () => {
       class="mx-4 overflow-hidden rounded-md bg-primary-dark pb-5 font-philosopher md:mx-auto md:max-w-lg"
     >
       <header
-        class="group bg-[url('/img/bg-mosque-3.png')] bg-cover bg-bottom py-14 text-center"
+        class="group bg-[url('/img/bg-mosque-3.png')] bg-cover bg-bottom py-14 px-5 text-center"
       >
-        <p
+        <content-editable
+          v-model="headerInfo.intro"
+          tag="p"
           class="text-xs tracking-widest text-gray-100 decoration-dotted decoration-1 underline-offset-2 outline-none focus:underline"
-          contenteditable="true"
           spellcheck="false"
-        >
-          Hadir dan Ikutilah
-        </p>
-        <h3
+        />
+        <content-editable
+          v-model="headerInfo.title"
+          tag="h3"
           class="text-2xl font-bold text-accent decoration-dotted decoration-1 underline-offset-2 outline-none focus:underline"
-          contenteditable="true"
           spellcheck="false"
-        >
-          Judul Info Kajian
-        </h3>
-        <p
+        />
+        <content-editable
+          v-model="headerInfo.description"
+          tag="p"
           class="text-white decoration-dotted decoration-1 underline-offset-2 outline-none focus:underline"
-          contenteditable="true"
           spellcheck="false"
-        >
-          Keterangan Tambahan
-        </p>
+        />
       </header>
       <p v-if="events.length == 0" class="text-center text-white">
         Silakan klik <b>Tambah Jadwal</b> di bawah untuk memulai.
@@ -198,6 +216,15 @@ const download = () => {
       >
         <i-mdi-plus-circle class="mr-1" />
         <span>Tambah Jadwal</span>
+      </button>
+      <!-- Reset button -->
+      <button
+        v-if="isAnyChanges"
+        class="hide-on-save mx-auto mt-3 flex items-center font-mono text-xs text-red-500"
+        @click="reset()"
+      >
+        <i-mdi-brush-variant class="mr-1" />
+        Bersihkan
       </button>
       <!-- Footer -->
       <footer class="mx-5 mt-5 text-center font-mono text-xs text-accent">
